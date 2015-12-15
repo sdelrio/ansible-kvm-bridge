@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Sergio R. M.
+  description: Install kvm and bridge on debian
+  license: license (BSD)
+  min_ansible_version: 1.2
+  platforms:
+  - name: Debian
+    versions:
+    - jessie
+  categories:
+  - networking
+  - system
+dependencies: []

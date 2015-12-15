@@ -1,0 +1,40 @@
+---
+- name: Instal packages
+  apt: pkg={{item}} state=present install_recommends=false
+  with_items:
+    - qemu-kvm
+    - libvirt-bin
+    - virtinst
+    - qemu-kvm
+    - virt-viewer
+    - bridge-utils
+
+- name: Add user to group
+  user: name={{ item }} groups={{ kvm_groups }}
+  with_items: [ "{{ kvm_users }}" ]
+  when: kvm_users is defined 
+
+- name: Load kernel module
+  modprobe: name=kvm-{{kvm_cpu}} state=present
+
+- name: Create bridge br0 
+  command: brctl addbr {{ kvm_bridge_interface }}
+  when: ansible_{{ kvm_bridge_interface }} is not defined
+
+- debug: var=ansible_{{ kvm_bridge_interface }}.interfaces
+- debug: var=ansible_{{ kvm_bridge_interface }}.interfaces[{{ kvm_phys_interface }}]
+
+- name: Join br0 with physical interface
+  command: brctl addif {{ kvm_bridge_interface }} {{ kvm_phys_interface }}
+  when: "'{{ kvm_phys_interface }}' in 'ansible_{{ kvm_bridge_interface }}.interfaces'"
+
+- name: Bridge interface
+  template: 
+    src=kvm-bridge.j2 
+    dest=/etc/network/interfaces.d/kvm-bridge 
+    owner=root 
+    group=root 
+    mode=0644
+  notify:
+   - restart networking
+

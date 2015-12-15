@@ -1,0 +1,17 @@
+---
+kvm_groups: libvirt,kvm
+kvm_users: 
+  - "{{ ansible_ssh_user }}"
+kvm_cpu: intel
+#kvm_cpu: amd
+kvm_phys_interface: eth0
+kvm_bridge_interface: br0
+kvm_bridge_ipv4:
+  - address: 192.168.66.6
+  - netmask: 255.255.255.0
+  - network: 192.168.66.0
+  - broadcast: 192.168.66.255 
+#  - gateway: 192.168.66.1
+  - bridge_ports: "{{ kvm_phys_interface }}"
+  - bridge_stp: 'on'
+  - bridge_maxwait: 0
